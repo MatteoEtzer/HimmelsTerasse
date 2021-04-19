@@ -19,7 +19,7 @@ public class MoveBase : MonoBehaviour
         sBase = GameObject.Find("SpawnManager").GetComponent<SpawnBases>();
         Touch = GameObject.Find("SpawnManager").GetComponent<SwipeInput>();
     }
-
+    /*
     void Update()
     {
         pos = this.transform.position;
@@ -51,4 +51,5 @@ public class MoveBase : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
+    */
 }

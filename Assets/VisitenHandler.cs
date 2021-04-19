@@ -11,13 +11,19 @@ public class VisitenHandler : MonoBehaviour
     public GameObject cardObject;
     public GameObject cardParent;
     public float cardHeight;
-    
 
-    void Start()
+
+    private void Start()
     {
-
         StartCoroutine(LoadAllRows());
+    }
 
+    public void LoadRows()
+    {
+        Destroy(cardParent.transform.GetChild(1).gameObject);
+        Destroy(cardParent.transform.GetChild(2).gameObject);
+        Destroy(cardParent.transform.GetChild(3).gameObject);
+        StartCoroutine(LoadAllRows());
     }
 
     IEnumerator LoadAllRows()
@@ -92,12 +98,13 @@ public class VisitenHandler : MonoBehaviour
                         canvasObject.Find("death Value").GetComponent<Text>().text = deathDates[2] + "." + deathDates[1] + "." + deathDates[0];
                         canvasObject.Find("lifecity Value").GetComponent<Text>().text = resultDetails[13];
 
-                        // Image cardImage = spawnCard.transform.Find("Canvas").transform.Find("Image").GetComponent<Image>();
+                        /*
+                        Image cardImage = spawnCard.transform.Find("Canvas").transform.Find("Image").GetComponent<Image>();
 
-                        //Debug.Log("Imagename: " + resultDetails[15]);
+                        Debug.Log("Imagename: " + resultDetails[15]);
 
-                        //StartCoroutine(DownloadImage(resultArray[15], cardImage)); 
-
+                        StartCoroutine(DownloadImage(resultArray[15], cardImage)); 
+                        */
                     }
 
                 }

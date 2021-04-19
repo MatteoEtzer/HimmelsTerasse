@@ -15,6 +15,7 @@ public class InputScript : MonoBehaviour
     public bool ReturnButtonClicked = false;
     public float smoothTime = 0.3F;
     private Vector3 velocity = Vector3.zero;
+    public GameObject randomize;
 
 
 
@@ -70,14 +71,14 @@ public class InputScript : MonoBehaviour
 
         if (SearchButtonClicked == true)
         {
-            StartCoroutine("SearchAnimation");
-            SearchButtonClicked = false;
+            //StartCoroutine("SearchAnimation");
+            //SearchButtonClicked = false;
         }
 
         if (ReturnButtonClicked == true)
         {
-            StartCoroutine("ReturnAnimation");
-            ReturnButtonClicked = false;
+            //StartCoroutine("ReturnAnimation");
+            //ReturnButtonClicked = false;
         }
         pos = this.transform.position;
 
@@ -92,6 +93,7 @@ public class InputScript : MonoBehaviour
         ReturnButton.SetActive(true);
         SearchBar.SetActive(true);
         OSK.SetActive(true);
+        randomize.SetActive(false);
     }
 
     IEnumerator SearchAnimation()
@@ -122,6 +124,7 @@ public class InputScript : MonoBehaviour
         SearchButton.SetActive(true);
         SearchBar.SetActive(false);
         OSK.SetActive(false);
+        randomize.SetActive(true);
     }
 
 

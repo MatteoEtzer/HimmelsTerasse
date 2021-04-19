@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 /*
  * Swipe Input script for Unity by @fonserbc, free to use wherever
@@ -11,76 +12,124 @@ using UnityEngine;
 
 public class SwipeInput : MonoBehaviour {
 
-	// If the touch is longer than MAX_SWIPE_TIME, we dont consider it a swipe
-	public const float MAX_SWIPE_TIME = 20.0f; 
-	
-	// Factor of the screen width that we consider a swipe
-	// 0.17 works well for portrait mode 16:9 phone
-	public const float MIN_SWIPE_DISTANCE = 0.17f;
+    public Transform TreeTarget;
+    public Transform CloudTarget;
+    public GameObject SearchButton;
+    public GameObject ReturnButton;
+    public GameObject SearchBar;
+    public GameObject OSK;
+    public bool SearchButtonClicked = false;
+    public bool ReturnButtonClicked = false;
+    public float smoothTime = 0.3F;
+    private Vector3 velocity = Vector3.zero;
 
-	public static bool swipedRight = false;
-	public static bool swipedLeft = false;
-	public static bool swipedUp = false;
-	public static bool swipedDown = false;
-	
-	
-	public bool debugWithArrowKeys = true;
 
-	Vector2 startPos;
-	float startTime;
 
-	public void Update()
-	{
-		swipedRight = false;
-		swipedLeft = false;
-		swipedUp = false;
-		swipedDown = false;
+    //Overcloud Position Test
+    public GameObject OverCloudObject;
 
-		if(Input.touches.Length > 0)
-		{
-			Touch t = Input.GetTouch(0);
-			if(t.phase == TouchPhase.Began)
-			{
-				startPos = new Vector2(t.position.x/(float)Screen.width, t.position.y/(float)Screen.width);
-				startTime = Time.time;
-			}
-			if(t.phase == TouchPhase.Ended)
-			{
-				if (Time.time - startTime > MAX_SWIPE_TIME) // press too long
-					return;
+    public float dragSpeed;
+    private Vector3 dragOrigin;
+    private Vector3 mouse;
+    private Vector3 mouseLastFrame;
+    private float dist;
+    public float distBias;
 
-				Vector2 endPos = new Vector2(t.position.x/(float)Screen.width, t.position.y/(float)Screen.width);
+    public Vector3 pos;
 
-				Vector2 swipe = new Vector2(endPos.x - startPos.x, endPos.y - startPos.y);
 
-				if (swipe.magnitude < MIN_SWIPE_DISTANCE) // Too short swipe
-					return;
+    void Start()
+    {
+        SearchBar.SetActive(false);
+        ReturnButton.SetActive(false);
+        OSK.SetActive(false);
 
-				if (Mathf.Abs (swipe.x) > Mathf.Abs (swipe.y)) { // Horizontal swipe
-					if (swipe.x > 0) {
-						swipedRight = true;
-					}
-					else {
-						swipedLeft = true;
-					}
-				}
-				else { // Vertical swipe
-					if (swipe.y > 0) {
-						swipedUp = true;
-					}
-					else {
-						swipedDown = true;
-					}
-				}
-			}
-		}
+        Debug.Log(this.gameObject.name);
+    }
 
-		if (debugWithArrowKeys) {
-			swipedDown = swipedDown || Input.GetKeyDown (KeyCode.DownArrow);
-			swipedUp = swipedUp|| Input.GetKeyDown (KeyCode.UpArrow);
-			swipedRight = swipedRight || Input.GetKeyDown (KeyCode.RightArrow);
-			swipedLeft = swipedLeft || Input.GetKeyDown (KeyCode.LeftArrow);
-		}
-	}
-	
+    void Update()
+    {
+        mouse = Input.mousePosition;
+        dist = Vector3.Distance(mouse, mouseLastFrame);
+
+        //dragging implementation
+        if (Input.GetMouseButtonDown(0))
+        {
+            dragOrigin = Input.mousePosition;
+            return;
+        }
+
+        if (!Input.GetMouseButton(0)) return;
+
+        if (dist > distBias)
+        {
+            pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+            Vector3 move = new Vector3(pos.x, 0, pos.y);
+            transform.Translate(move, Space.World);
+        }
+
+        mouseLastFrame = Input.mousePosition;
+
+        //end of dragging
+
+
+        //search fields
+
+        if (SearchButtonClicked == true)
+        {
+            StartCoroutine("SearchAnimation");
+            SearchButtonClicked = false;
+        }
+
+        if (ReturnButtonClicked == true)
+        {
+            StartCoroutine("ReturnAnimation");
+            ReturnButtonClicked = false;
+        }
+        pos = this.transform.position;
+
+    }
+
+
+    public void Search()
+    {
+        TreeTarget.position = this.transform.position;
+        SearchButtonClicked = true;
+        SearchButton.SetActive(false);
+        ReturnButton.SetActive(true);
+        SearchBar.SetActive(true);
+        OSK.SetActive(true);
+    }
+
+    IEnumerator SearchAnimation()
+    {
+        for (float ft = 10f; ft >= 0; ft -= 0.1f)
+        {
+            Vector3 targetPosition = CloudTarget.TransformPoint(new Vector3(0, 0, 0));
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+            yield return null;
+        }
+    }
+
+    IEnumerator ReturnAnimation()
+    {
+        for (float ft = 10f; ft >= 0; ft -= 0.1f)
+        {
+            Vector3 targetPosition = TreeTarget.TransformPoint(new Vector3(0, 0, 0));
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+            yield return null;
+        }
+    }
+
+    public void ReturnToTree()
+    {
+        ReturnButtonClicked = true;
+        Debug.Log("Return-Button clicked");
+        ReturnButton.SetActive(false);
+        SearchButton.SetActive(true);
+        SearchBar.SetActive(false);
+        OSK.SetActive(false);
+    }
+
+
 }
